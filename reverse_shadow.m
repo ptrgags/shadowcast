@@ -3,7 +3,7 @@
 
 % Shadow vertices
 % Square on the table
-%
+%{
 shadow = [
     1, 7, 0;
     3, 7, 0;
@@ -12,7 +12,7 @@ shadow = [
 %}
 
 % M shape
-%{
+%
 shadow = [
     0.5, 3.5, 0;
     1, 6.5, 0;
@@ -46,6 +46,8 @@ card = [
 ];
 %}
 card_center = [2, 2, 3.5];
+%card_center = [2, 1, 3.5];
+%card_normal = [cos(pi / 6), sin(pi / 6), 0];
 card_normal = [0, 1, 0];
 %card_normal = [sqrt(2), sqrt(2), 0];
 
