@@ -3,7 +3,7 @@
 
 % Shadow vertices
 % Square on the table
-%{
+%
 shadow = [
     1, 7, 0;
     3, 7, 0;
@@ -12,7 +12,7 @@ shadow = [
 %}
 
 % M shape
-%
+%{
 shadow = [
     0.5, 3.5, 0;
     1, 6.5, 0;
@@ -29,8 +29,11 @@ shadow = [
     1, 3.5, 0];
 %}
 
-% Position and normal of card
-%
+% vertical art trading card facing down the Y-axis with the base
+% centered at the origin. Everything is measured in inches
+CARD_DIMS = [2.5, 3.5];
+card = Quad([0, 0, 3.5 / 2], [pi / 4, pi / 4], CARD_DIMS);
+%{
 card = [
     0, 2, 8;
     0, 2, 0;
@@ -45,14 +48,14 @@ card = [
     4, 0, 0;
 ];
 %}
-card_center = [2, 2, 3.5];
+%card_center = [2, 2, 3.5];
 %card_center = [2, 1, 3.5];
 %card_normal = [cos(pi / 6), sin(pi / 6), 0];
-card_normal = [0, 1, 0];
+%card_normal = [0, 1, 0];
 %card_normal = [sqrt(2), sqrt(2), 0];
 
-% Light position
-light = [2, 0, 7];
+% The light is a little bit behind and above the card
+light = [0, -4, 4];
 
 % Calculate the direction from light to
 % the shadow vertices
@@ -61,9 +64,9 @@ ray_lengths = vecnorm(light_rays, 2, 2);
 light_dirs = light_rays ./ ray_lengths;
 
 % Calculate where the light rays intersect the card
-light_to_card = card_center - light;
-top = dot(light_to_card, card_normal);
-rep = repmat(card_normal, size(light_dirs, 1), 1);
+light_to_card = card.center - light;
+top = dot(light_to_card, card.normal);
+rep = repmat(card.normal, size(light_dirs, 1), 1);
 bottom = dot(light_dirs, rep, 2);
 t = top ./ bottom;
 
@@ -103,7 +106,8 @@ plot3(rays(1:2, :), rays(3:4, :), rays(5:6, :), 'r');
 
 
 % Card
-fill3(card(:, 1), card(:, 2), card(:, 3), 'w');
+C = card.vertices;
+fill3(C(:, 1), C(:, 2), C(:, 3), 'w');
 
 % Cutout
 fill3(preimage(:, 1), preimage(:, 2), preimage(:, 3), [0.7, 0.7, 0.7]);
