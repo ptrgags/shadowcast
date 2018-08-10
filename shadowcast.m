@@ -5,7 +5,7 @@
 %
 % This really just computes a ray plane intersection.
 function image = shadowcast(light, points, plane)
-    light_dirs = light_directions(light, points);
+    light_dirs = calc_directions(light, points);
     
     light_to_wall = plane.center - light;
     
