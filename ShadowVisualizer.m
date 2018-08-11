@@ -9,7 +9,8 @@ classdef ShadowVisualizer < handle
         surfaces cell;
         shapes cell;
         shadows cell;
-        links cell;
+        cutouts cell;
+        rays cell;
     end
     methods
         % Add a light to the list and return
@@ -43,22 +44,43 @@ classdef ShadowVisualizer < handle
             obj.shadows{end + 1} = shadow;
         end
         
-        % Link light -> shape -> surface triples
-        % by passing in the indices
-        function add_link(obj, light, shape, surface)
-            row = length(obj.links) + 1;
-            obj.links{row, 1} = light;
-            obj.links{row, 2} = shape;
-            obj.links{row, 3} = surface;
+        function add_cutout(obj, light_idx, card_idx, shape)
+            % Save the shape
+            obj.add_shape(shape);
+            
+            % Shadowcast to calculate where the cutout is
+            light = obj.lights{light_idx};
+            card = obj.surfaces{card_idx};
+            cutout = shadowcast(light, shape, card);
+            obj.cutouts{end + 1} = cutout;
+            
+            % Also store the light rays
+            obj.add_rays(light, shape);
         end
+        
+        function add_rays(obj, light, shape)
+            N = size(shape, 1);
+            % We're going to plot N line segments in 3D with 2 points each
+            % but we need to rearrange the data for a call to plot3
+            segments = zeros(2 * 3, N);
+            % Put the shadow points in every other row. Note that
+            % each point is now a spaced out column vector.
+            segments(1:2:5, :) = shape';
+            % interleave the light coordinates so every line is drawn
+            % to the light source.
+            segments(2:2:6, :) = repmat(light', 1, N);
+            
+            obj.rays{end + 1} = segments;
+        end        
         
         function plot(obj)
             obj.setup_plot;
             obj.plot_shadows;
             obj.plot_surfaces;
             obj.plot_lights;
-            %obj.plot_rays;
-            %obj.plot_cutouts;
+            obj.plot_rays;
+            obj.plot_shapes;
+            obj.plot_cutouts;
         end
         
         % Plot the shadows the card casts
@@ -76,6 +98,31 @@ classdef ShadowVisualizer < handle
                 if visible
                     obj.fill_cols(surface.vertices, 'w');
                 end
+            end
+        end
+        
+        function plot_rays(obj)
+            for i = 1:length(obj.rays)
+                segments = obj.rays{i};
+                % now plot the rays as line segments
+                plot3(...
+                    segments(1:2, :),...
+                    segments(3:4, :),...
+                    segments(5:6, :),...
+                    'r');
+            end
+        end
+        
+        % Plot the shadows the card casts
+        function plot_shapes(obj)
+            for i = 1:length(obj.shapes)
+                obj.fill_cols(obj.shapes{i}, 'w');
+            end
+        end
+        
+        function plot_cutouts(obj)
+            for i = 1:length(obj.cutouts)
+                obj.fill_cols(obj.cutouts{i}, [0.7, 0.7, 0.7]);
             end
         end
         

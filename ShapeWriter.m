@@ -17,8 +17,10 @@ classdef ShapeWriter
             
             % Write the preamble 
             fprintf(ps_file, '%%!PS\n');
-            %sfprintf(ps_file, '/inch {72 mul} def\n');
-            %fprintf(ps_file, '1 inch 1 inch translate\n');
+            
+            % TODO: Let the user select whether to add margins
+            fprintf(ps_file, '/inch {72 mul} def\n');
+            fprintf(ps_file, '1 inch 1 inch translate\n');
             
             obj.ps_file = ps_file;
         end
